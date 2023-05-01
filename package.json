@@ -1,5 +1,5 @@
 {
-  "name": "vuetify-project",
+  "name": "vue-picker-wheel",
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",

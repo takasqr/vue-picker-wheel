@@ -62,6 +62,9 @@ export default {
 
       var width = 308
 
+      // ピースの幅
+      var piWidth = 100
+
       // 画面の幅が308より小さかったらルーレットのサイズを調整する
       if (document.body.offsetWidth < (308 + 84)) {
         width = document.body.offsetWidth - 84
@@ -108,9 +111,9 @@ export default {
                           margin: auto;
                           position: absolute;
                           display: block;
-                          width: 100px;
+                          width: ${piWidth}px;
                           height: ${width / 2}px;
-                          transform-origin: 50px ${width / 2}px;
+                          transform-origin: ${piWidth / 2}px ${width / 2}px;
                         }`, sheet.cssRules.length)
 
       sheet.insertRule(`#roulette-restaurant___app---roulette li::before {
@@ -122,7 +125,7 @@ export default {
                           width: 0;
                           height: 0;
                           border-style: solid;
-                          border-width: ${width / 2}px 50px;
+                          border-width: ${width / 2}px ${piWidth / 2}px;
                           z-index: 0;
                         }`, sheet.cssRules.length)
 
@@ -138,6 +141,12 @@ export default {
 
         sheet.insertRule(`#roulette-restaurant___app---roulette li:nth-of-type(${step}):before {
                             border-color: ${props.colors[contentNo]} transparent transparent;
+                          }`, sheet.cssRules.length)
+
+
+        var degree = 360 / 10
+        sheet.insertRule(`#roulette-restaurant___app---roulette li:nth-of-type(${step}) {
+                            transform: rotate(${degree * step}deg);
                           }`, sheet.cssRules.length)
       }
     }

@@ -1,9 +1,22 @@
 {
   "name": "vue-picker-wheel",
-  "version": "0.0.0",
+  "version": "0.0.2",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/vue-picker-wheel.umd.cjs",
+  "module": "./dist/vue-picker-wheel.js",
+  "exports": {
+    ".": {
+      "import": "./dist/vue-picker-wheel.js",
+      "require": "./dist/vue-picker-wheel.umd.cjs"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
+    "tsc": "vue-tsc",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -27,6 +27,27 @@ export default {
         searchOptions.value = searchOptionsEnglish
       }
     })
+
+    // この関数は、配列を引数として受け取り、要素数が4以下の場合、
+    // 配列に空の要素を追加して、要素数が4になるようにします。
+    function padArrayToFour(arr) {
+      if (Array.isArray(arr) && arr.length < 4) {
+        const padCount = 4 - arr.length;
+        for (let i = 0; i < padCount; i++) {
+          arr.push("");
+        }
+      }
+      return arr;
+    }
+
+    // この関数は、配列を引数として受け取り、要素数が10以上の場合、
+    // 配列から要素を削除して要素数が10になるようにします。
+    function trimArrayToTen(arr) {
+      if (Array.isArray(arr) && arr.length >= 10) {
+        arr.length = 10;
+      }
+      return arr;
+    }
     
     function run() {
       // パラメータを初期化
@@ -35,7 +56,11 @@ export default {
       // ボタンを非活性
       buttonDisabled.value = true
 
-      const resultNumber = Math.floor(Math.random() * 9) + 1
+      // 要素数の調整
+      var cell = padArrayToFour(props.cell)
+      cell = trimArrayToTen(cell)
+
+      const resultNumber = Math.floor(Math.random() * (cell.length - 1)) + 1
 
 
       // ルーレット回転開始
@@ -51,19 +76,48 @@ export default {
 
       // 検索エリア
       setTimeout(() => {
-        searchArea.value = props.cell[result.value - 1]
+        searchArea.value = cell[result.value - 1]
       }, 3000)
 
       // Google TagManager
       dataLayer.push({ event: 'use-webapp' })
     }
 
+    function getPiWidth(piCount) {
+      if (piCount === 1) {
+        return 100
+      } else if (piCount === 2) {
+        return 100
+      } else if (piCount === 3) {
+        return 100
+      } else if (piCount === 4) {
+        return 308
+      } else if (piCount === 5) {
+        return 224
+      } else if (piCount === 6) {
+        return 179
+      } else if (piCount === 7) {
+        return 150
+      } else if (piCount === 8) {
+        return 128
+      } else if (piCount === 9) {
+        return 112
+      } else if (piCount === 10) {
+        return 100
+      } else {
+        return 100
+      }
+
+    }
     function createRoulette() {
+      // 要素数の調整
+      var cell = padArrayToFour(props.cell)
+      cell = trimArrayToTen(cell)
 
       var width = 308
 
       // ピースの幅
-      var piWidth = 100
+      var piWidth = getPiWidth(cell.length)
 
       // 画面の幅が308より小さかったらルーレットのサイズを調整する
       if (document.body.offsetWidth < (308 + 84)) {
@@ -129,13 +183,29 @@ export default {
                           z-index: 0;
                         }`, sheet.cssRules.length)
 
+      // ルーレットの文字を表示する
+      sheet.insertRule(`#roulette-restaurant___app---roulette li::after {
+                          counter-increment: number;
+                          content: counter(number);
+                          z-index: 5;
+                          position: absolute;
+                          display: block;
+                          text-align: center;
+                          line-height: 40px;
+                          font-size: 20px;
+                          color: #fff;
+                          font-weight: bold;
+                          top: 5px;
+                          left: ${(piWidth - 40) / 2}px;
+                        }`, sheet.cssRules.length)
+
       
-      for (let step = 1; step <= 10; step++) {
+      for (let step = 1; step <= cell.length; step++) {
         var contentNo = step - 1
 
         // ルーレットの文字を入れる
         sheet.insertRule(`#roulette-restaurant___app---roulette li:nth-of-type(${step}):after {
-                            content: "${props.cell[contentNo]}";
+                            content: "${cell[contentNo]}";
                             writing-mode: vertical-lr;
                           }`, sheet.cssRules.length)
 
@@ -144,9 +214,37 @@ export default {
                           }`, sheet.cssRules.length)
 
 
-        var degree = 360 / 10
+        var degree = 360 / cell.length
+
         sheet.insertRule(`#roulette-restaurant___app---roulette li:nth-of-type(${step}) {
                             transform: rotate(${degree * step}deg);
+                          }`, sheet.cssRules.length)
+
+        // ルーレットの動き
+        sheet.insertRule(`#roulette-restaurant___app---roulette li:nth-of-type(${step}) {
+                            transform: rotate(${degree * step}deg);
+                          }`, sheet.cssRules.length)
+
+        sheet.insertRule(`#roulette-restaurant___app---roulette.number-${step} {
+                            -webkit-animation-name: 'number-${step}';
+                          }`, sheet.cssRules.length)
+
+        sheet.insertRule(`@-webkit-keyframes number-${step} {
+                            from {
+                              transform: rotate(0);
+                            }
+                            to {
+                              transform: rotate(${3240 - (degree * step)}deg);
+                            }
+                          }`, sheet.cssRules.length)
+
+        sheet.insertRule(`@keyframes number-${step} {
+                            from {
+                              transform: rotate(0);
+                            }
+                            to {
+                              transform: rotate(${3240 - (degree * step)}deg);
+                            }
                           }`, sheet.cssRules.length)
       }
     }
@@ -174,16 +272,7 @@ export default {
     <p class="text-center text-h4">👇</p>
 
     <ul id="roulette-restaurant___app---roulette" v-bind:class="[resultClassName]">
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
+      <li v-for="value in cell"></li>
     </ul>
   </div>
   <div class="ma-4" style="height: 40px;">
@@ -207,243 +296,6 @@ export default {
 </template>
 
 <style>
-#roulette-restaurant___app---roulette li::after {
-  counter-increment: number;
-  content: counter(number);
-  z-index: 5;
-  position: absolute;
-  display: block;
-  text-align: center;
-  line-height: 40px;
-  font-size: 20px;
-  color: #fff;
-  font-weight: bold;
-  top: 5px;
-  left: 30px;
-}
-#roulette-restaurant___app---roulette li:nth-of-type(1) {
-  transform: rotate(36deg);
-}
-#roulette-restaurant___app---roulette li:nth-of-type(2) {
-  transform: rotate(72deg);
-}
-#roulette-restaurant___app---roulette li:nth-of-type(3) {
-  transform: rotate(108deg);
-}
-#roulette-restaurant___app---roulette li:nth-of-type(4) {
-  transform: rotate(144deg);
-}
-#roulette-restaurant___app---roulette li:nth-of-type(5) {
-  transform: rotate(180deg);
-}
-#roulette-restaurant___app---roulette li:nth-of-type(6) {
-  transform: rotate(216deg);
-}
-#roulette-restaurant___app---roulette li:nth-of-type(7) {
-  transform: rotate(252deg);
-}
-#roulette-restaurant___app---roulette li:nth-of-type(8) {
-  transform: rotate(288deg);
-}
-#roulette-restaurant___app---roulette li:nth-of-type(9) {
-  transform: rotate(324deg);
-}
-#roulette-restaurant___app---roulette li:nth-of-type(10) {
-  transform: rotate(360deg);
-}
-
-#roulette-restaurant___app---roulette.number-1 {
-  -webkit-animation-name: 'number-1';
-}
-#roulette-restaurant___app---roulette.number-2 {
-  -webkit-animation-name: 'number-2';
-}
-#roulette-restaurant___app---roulette.number-3 {
-  -webkit-animation-name: 'number-3';
-}
-#roulette-restaurant___app---roulette.number-4 {
-  -webkit-animation-name: 'number-4';
-}
-#roulette-restaurant___app---roulette.number-5 {
-  -webkit-animation-name: 'number-5';
-}
-#roulette-restaurant___app---roulette.number-6 {
-  -webkit-animation-name: 'number-6';
-}
-#roulette-restaurant___app---roulette.number-7 {
-  -webkit-animation-name: 'number-7';
-}
-#roulette-restaurant___app---roulette.number-8 {
-  -webkit-animation-name: 'number-8';
-}
-#roulette-restaurant___app---roulette.number-9 {
-  -webkit-animation-name: 'number-9';
-}
-#roulette-restaurant___app---roulette.number-10 {
-  -webkit-animation-name: 'number-10';
-}
-
-@-webkit-keyframes number-1 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(3204deg);
-  }
-}
-@keyframes number-1 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(3204deg);
-  }
-}
-@-webkit-keyframes number-2 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(3168deg);
-  }
-}
-@keyframes number-2 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(3168deg);
-  }
-}
-@-webkit-keyframes number-3 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(3132deg);
-  }
-}
-@keyframes number-3 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(3132deg);
-  }
-}
-@-webkit-keyframes number-4 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(3096deg);
-  }
-}
-@keyframes number-4 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(3096deg);
-  }
-}
-@-webkit-keyframes number-5 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(3060deg);
-  }
-}
-@keyframes number-5 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(3060deg);
-  }
-}
-@-webkit-keyframes number-6 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(3024deg);
-  }
-}
-@keyframes number-6 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(3024deg);
-  }
-}
-@-webkit-keyframes number-7 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(2988deg);
-  }
-}
-@keyframes number-7 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(2988deg);
-  }
-}
-@-webkit-keyframes number-8 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(2952deg);
-  }
-}
-@keyframes number-8 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(2952deg);
-  }
-}
-@-webkit-keyframes number-9 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(2916deg);
-  }
-}
-@keyframes number-9 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(2916deg);
-  }
-}
-@-webkit-keyframes number-10 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(2880deg);
-  }
-}
-@keyframes number-10 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(2880deg);
-  }
-}
-
 /* 紙吹雪 */
 
 /* positionを上にずらした初期の紙吹雪を overflow: hidden で隠す */

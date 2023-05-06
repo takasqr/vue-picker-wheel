@@ -35,7 +35,8 @@ export default {
       const inputArray = e.target.value.split('\n')
 
       // 入力内容をルーレットに反映
-      for (let i = 0; i < 10; i++) {
+      restaurants.value = []
+      for (let i = 0; i < inputArray.length; i++) {
         restaurants.value[i] = inputArray[i] ? inputArray[i] : ''
       }
     }

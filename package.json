@@ -1,10 +1,11 @@
 {
   "name": "vue-picker-wheel",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "type": "module",
   "files": [
     "dist"
   ],
+  "license": "UNLICENSED",
   "main": "./dist/vue-picker-wheel.umd.cjs",
   "module": "./dist/vue-picker-wheel.js",
   "exports": {
